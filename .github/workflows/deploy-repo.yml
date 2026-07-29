@@ -33,6 +33,7 @@ jobs:
       - name: Download deb artifacts from hitokoto-cli CI
         uses: actions/download-artifact@v4
         with:
+          repository: xiSage/hitokoto-cli
           run-id: ${{ github.event.client_payload.run_id || inputs.run_id }}
           github-token: ${{ secrets.REPO_ACCESS_TOKEN }}
           path: ./debs-all
