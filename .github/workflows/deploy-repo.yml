@@ -1,13 +1,14 @@
-# 此 workflow 由 hitokoto-cli 仓库的 release 触发。
-# 它下载 CI 构建的 Termux .deb 包，用 termux-apt-repo 生成 APT 仓库结构，
-# 然后部署到 GitHub Pages (gh-pages 分支)。
+# This workflow is triggered by the hitokoto-cli repository on release.
+# It downloads the Termux .deb artifacts built by hitokoto-cli CI,
+# generates the APT repository structure with termux-apt-repo,
+# and deploys it to GitHub Pages (gh-pages branch).
 name: Deploy Termux APT Repo
 
 on:
-  # 允许由其他仓库 (hitokoto-cli CI) 通过 repository_dispatch 触发
+  # Triggered by another repository (hitokoto-cli CI) via repository_dispatch
   repository_dispatch:
     types: [deploy-termux-debs]
-  # 也支持手动触发（需提供 hitokoto-cli CI 的 run ID）
+  # Also supports manual trigger (requires hitokoto-cli CI run ID)
   workflow_dispatch:
     inputs:
       run_id:
@@ -40,7 +41,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p ./debs
-          # 从所有下载的 artifact 中提取 Termux deb 文件
+          # Extract Termux deb files from all downloaded artifacts
           find ./debs-all -name '*termux*.deb' -exec cp {} ./debs/ \; 2>/dev/null || true
           echo "=== Collected deb files ==="
           ls -la ./debs/
@@ -54,14 +55,14 @@ jobs:
 
       - name: Build APT repo
         run: |
-          # 生成 APT 仓库结构到 ./repo-output
-          # stable = 发行版名, main = 组件名
+          # Generate APT repository structure into ./repo-output
+          # stable = distribution name, main = component name
           termux-apt-repo ./debs ./repo-output stable main
 
-          # 保留 .nojekyll (禁用 Jekyll)
+          # Keep .nojekyll (disable Jekyll)
           cp .nojekyll ./repo-output/ 2>/dev/null || touch ./repo-output/.nojekyll
 
-          # 保留 README.md
+          # Keep README.md
           cp README.md ./repo-output/
 
       - name: Deploy to GitHub Pages
@@ -69,5 +70,5 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./repo-output
-          # 部署到 gh-pages 分支
+          # Deploy to gh-pages branch
           publish_branch: gh-pages

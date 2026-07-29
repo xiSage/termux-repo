@@ -1,10 +1,10 @@
 # termux-repo
 
-个人 Termux APT 软件源，托管在 GitHub Pages 上。
+Personal Termux APT repository hosted on GitHub Pages.
 
-## 添加源
+## Add the repository
 
-在 Termux 中执行：
+Run in Termux:
 
 ```bash
 echo "deb [trusted=yes] https://xisage.com/termux-repo stable main" \
@@ -13,19 +13,19 @@ echo "deb [trusted=yes] https://xisage.com/termux-repo stable main" \
 pkg update
 ```
 
-## 安装软件包
+## Install packages
 
 ```bash
 pkg install hitokoto
 ```
 
-## 可用软件包
+## Available packages
 
-| 包名 | 说明 |
-|------|------|
-| hitokoto | 一言 CLI —— 在终端中获取一条随机的一言句子 |
+| Package | Description |
+|---------|-------------|
+| hitokoto | Hitokoto CLI - fetch a random hitokoto sentence in the terminal |
 
-## 说明
+## Notes
 
-- 源由 [hitokoto-cli](https://github.com/xiSage/hitokoto-cli) 的 CI 自动构建并发布。
-- 如未签名，`[trusted=yes]` 是必须的。
+- The repository is built and published automatically by the [hitokoto-cli](https://github.com/xiSage/hitokoto-cli) CI.
+- `[trusted=yes]` is required since the repository is not GPG-signed.
