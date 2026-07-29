@@ -1,0 +1,16 @@
+Package: hitokoto
+Version: 0.1.2
+Section: utils
+Priority: optional
+Architecture: aarch64
+Maintainer: xiSage <57551864+xiSage@users.noreply.github.com>
+Homepage: https://github.com/xiSage/hitokoto-cli
+Description: Hitokoto CLI
+ Fetch a random hitokoto sentence in the terminal.
+Filename: dists/stable/main/binary-aarch64/hitokoto-linux-bionic-arm64-termux.deb
+Size: 3206796
+MD5Sum: aab816dda9924a2d391f4514e6832539
+SHA1: f22605097d370293badfd00c9d961611a94d48a3
+SHA256: c427d9d671724425ccd7283c1a51ca70773a0f4ef8572bce59322a82145647d3
+SHA512: ddacb67b0bbe70ddcf1b9392ced2f30f916d1a689da0dcf79b0d01a618971f8c5f96c61d0c85c7b1fe9372d9df16cac192e3f7ed62254cbbf7fa8a30d7854a0d
+
