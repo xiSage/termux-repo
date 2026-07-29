@@ -1,0 +1,73 @@
+# 此 workflow 由 hitokoto-cli 仓库的 release 触发。
+# 它下载 CI 构建的 Termux .deb 包，用 termux-apt-repo 生成 APT 仓库结构，
+# 然后部署到 GitHub Pages (gh-pages 分支)。
+name: Deploy Termux APT Repo
+
+on:
+  # 允许由其他仓库 (hitokoto-cli CI) 通过 repository_dispatch 触发
+  repository_dispatch:
+    types: [deploy-termux-debs]
+  # 也支持手动触发（需提供 hitokoto-cli CI 的 run ID）
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: 'hitokoto-cli CI run ID that produced the deb artifacts'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pages: write
+
+jobs:
+  build-repo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout this repo
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Download deb artifacts from hitokoto-cli CI
+        uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ github.event.client_payload.run_id || inputs.run_id }}
+          github-token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          path: ./debs-all
+
+      - name: Collect Termux .deb files
+        shell: bash
+        run: |
+          mkdir -p ./debs
+          # 从所有下载的 artifact 中提取 Termux deb 文件
+          find ./debs-all -name '*termux*.deb' -exec cp {} ./debs/ \; 2>/dev/null || true
+          echo "=== Collected deb files ==="
+          ls -la ./debs/
+          if [ -z "$(ls -A ./debs/*.deb 2>/dev/null)" ]; then
+            echo "ERROR: No .deb files found"
+            exit 1
+          fi
+
+      - name: Install termux-apt-repo
+        run: pip install termux-apt-repo
+
+      - name: Build APT repo
+        run: |
+          # 生成 APT 仓库结构到 ./repo-output
+          # stable = 发行版名, main = 组件名
+          termux-apt-repo ./debs ./repo-output stable main
+
+          # 保留 .nojekyll (禁用 Jekyll)
+          cp .nojekyll ./repo-output/ 2>/dev/null || touch ./repo-output/.nojekyll
+
+          # 保留 README.md
+          cp README.md ./repo-output/
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./repo-output
+          # 部署到 gh-pages 分支
+          publish_branch: gh-pages
